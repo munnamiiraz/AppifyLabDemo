@@ -25,7 +25,8 @@ import {
   // Likes
   toggleLike,
   getPostLikes,
-  getPostComments
+  getPostComments,
+  getMyPosts
 } from '../controllers/post.controller';
 
 const router = Router();
@@ -33,6 +34,7 @@ const router = Router();
 // Post CRUD routes
 router.post("/", protect, upload.array('files', 4), createPost as any);
 router.get("/", protect, getPosts);
+router.get("/get-my-posts", protect, getMyPosts);
 router.get("/:postId", protect, getPostById);
 router.put("/:postId", protect, upload.array('files', 4), updatePost as any);
 router.delete("/:postId", protect, deletePost as any);

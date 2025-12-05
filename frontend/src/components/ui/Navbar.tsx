@@ -10,12 +10,24 @@ const Navbar = () => {
   const [profileOpen, setProfileOpen] = useState(false);
   const [notifyTab, setNotifyTab] = useState<'all' | 'unread'>('all');
   const [user, setUser] = useState<any>(null);
+  const [darkMode, setDarkMode] = useState(localStorage.getItem("darkMode") === "true");
 
   useEffect(() => {
     const userData = localStorage.getItem('user');
     if (userData) {
       setUser(JSON.parse(userData));
     }
+
+    const handleStorageChange = () => {
+      setDarkMode(localStorage.getItem("darkMode") === "true");
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('darkModeChange', handleStorageChange);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('darkModeChange', handleStorageChange);
+    };
   }, []);
 
   // Logout handler
@@ -33,7 +45,7 @@ const Navbar = () => {
     navigate('/login');
   };
 
-  const darkMode = localStorage.getItem("darkMode");
+
 
   const notifications = [
     {
@@ -68,12 +80,14 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className={` ${darkMode === "true"? "bg-[#0a2147]": "" } h-18 bg-white border-b border-gray-200 px-4 py-2 fixed top-0 left-0 right-0 z-50`}>
+      <nav className={`${darkMode ? "bg-[#112032]" : "bg-white"} h-18 border-b ${darkMode ? "border-gray-700" : "border-gray-200"} px-4 py-2 fixed top-0 left-0 right-0 z-50`}>
         <div className="max-w-7xl mx-auto flex items-center justify-between h-full">
           {/* Logo */}
-          <div className="flex items-center">
-            <img src={Logo} alt="Logo" className="h-8" />
-          </div>
+          <Link to="/">
+            <div className="flex items-center">
+              <img src={Logo} alt="Logo" className="h-8" />
+            </div>
+          </Link>
 
           {/* Search Bar */}
           <div className='mt-4 w-[400px]'>
@@ -89,17 +103,17 @@ const Navbar = () => {
           {/* Right Section */}
           <div className="flex items-center gap-4 ml-0 w-[450px]">
             {/* Home Icon */}
-            <Link to="#" className="flex items-center justify-center w-10 h-10 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors">
+            <Link to="#" className={`flex items-center justify-center w-10 h-10 rounded-lg ${darkMode ? "bg-blue-900/30 text-blue-400 hover:bg-blue-900/50" : "bg-blue-50 text-blue-600 hover:bg-blue-100"} transition-colors`}>
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="21" fill="none" viewBox="0 0 18 21">
-                <path className="_home_active" stroke="#000" strokeWidth="1.5" strokeOpacity=".6" d="M1 9.924c0-1.552 0-2.328.314-3.01.313-.682.902-1.187 2.08-2.196l1.143-.98C6.667 1.913 7.732 1 9 1c1.268 0 2.333.913 4.463 2.738l1.142.98c1.179 1.01 1.768 1.514 2.081 2.196.314.682.314 1.458.314 3.01v4.846c0 2.155 0 3.233-.67 3.902-.669.67-1.746.67-3.901.67H5.57c-2.155 0-3.232 0-3.902-.67C1 18.002 1 16.925 1 14.77V9.924z" />
-                <path className="_home_active" stroke="#000" strokeOpacity=".6" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M11.857 19.341v-5.857a1 1 0 00-1-1H7.143a1 1 0 00-1 1v5.857" />
+                <path className="_home_active" stroke={darkMode ? "#60a5fa" : "#000"} strokeWidth="1.5" strokeOpacity={darkMode ? "1" : ".6"} d="M1 9.924c0-1.552 0-2.328.314-3.01.313-.682.902-1.187 2.08-2.196l1.143-.98C6.667 1.913 7.732 1 9 1c1.268 0 2.333.913 4.463 2.738l1.142.98c1.179 1.01 1.768 1.514 2.081 2.196.314.682.314 1.458.314 3.01v4.846c0 2.155 0 3.233-.67 3.902-.669.67-1.746.67-3.901.67H5.57c-2.155 0-3.232 0-3.902-.67C1 18.002 1 16.925 1 14.77V9.924z" />
+                <path className="_home_active" stroke={darkMode ? "#60a5fa" : "#000"} strokeOpacity={darkMode ? "1" : ".6"} strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M11.857 19.341v-5.857a1 1 0 00-1-1H7.143a1 1 0 00-1 1v5.857" />
               </svg>
             </Link>
 
             {/* Users Icon */}
-            <Link to="#" className="flex items-center justify-center w-10 h-10 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors">
+            <Link to="#" className={`flex items-center justify-center w-10 h-10 rounded-lg ${darkMode ? "text-gray-400 hover:bg-gray-800 hover:text-gray-200" : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"} transition-colors`}>
               <svg xmlns="http://www.w3.org/2000/svg" width="26" height="20" fill="none" viewBox="0 0 26 20">
-                <path fill="#000" fillOpacity=".6" fillRule="evenodd" d="M12.79 12.15h.429c2.268.015 7.45.243 7.45 3.732 0 3.466-5.002 3.692-7.415 3.707h-.894c-2.268-.015-7.452-.243-7.452-3.727 0-3.47 5.184-3.697 7.452-3.711l.297-.001h.132zm0 1.75c-2.792 0-6.12.34-6.12 1.962 0 1.585 3.13 1.955 5.864 1.976l.255.002c2.792 0 6.118-.34 6.118-1.958 0-1.638-3.326-1.982-6.118-1.982zm9.343-2.224c2.846.424 3.444 1.751 3.444 2.79 0 .636-.251 1.794-1.931 2.43a.882.882 0 01-1.137-.506.873.873 0 01.51-1.13c.796-.3.796-.633.796-.793 0-.511-.654-.868-1.944-1.06a.878.878 0 01-.741-.996.886.886 0 011.003-.735zm-17.685.735a.878.878 0 01-.742.997c-1.29.19-1.944.548-1.944 1.059 0 .16 0 .491.798.793a.873.873 0 01-.314 1.693.897.897 0 01-.313-.057C.25 16.259 0 15.1 0 14.466c0-1.037.598-2.366 3.446-2.79.485-.06.929.257 1.002.735zM12.789 0c2.96 0 5.368 2.392 5.368 5.33 0 2.94-2.407 5.331-5.368 5.331h-.031a5.329 5.329 0 01-3.782-1.57 5.253 5.253 0 01-1.553-3.764C7.423 2.392 9.83 0 12.789 0zm0 1.75c-1.987 0-3.604 1.607-3.604 3.58a3.526 3.526 0 001.04 2.527 3.58 3.58 0 002.535 1.054l.03.875v-.875c1.987 0 3.605-1.605 3.605-3.58S14.777 1.75 12.789 1.75zm7.27-.607a4.222 4.222 0 013.566 4.172c-.004 2.094-1.58 3.89-3.665 4.181a.88.88 0 01-.994-.745.875.875 0 01.75-.989 2.494 2.494 0 002.147-2.45 2.473 2.473 0 00-2.09-2.443.876.876 0 01-.726-1.005.881.881 0 011.013-.721zm-13.528.72a.876.876 0 01-.726 1.006 2.474 2.474 0 00-2.09 2.446A2.493 2.493 0 005.86 7.762a.875.875 0 11-.243 1.734c-2.085-.29-3.66-2.087-3.664-4.179 0-2.082 1.5-3.837 3.566-4.174a.876.876 0 011.012.72z" clipRule="evenodd" />
+                <path fill={darkMode ? "#9ca3af" : "#000"} fillOpacity={darkMode ? "1" : ".6"} fillRule="evenodd" d="M12.79 12.15h.429c2.268.015 7.45.243 7.45 3.732 0 3.466-5.002 3.692-7.415 3.707h-.894c-2.268-.015-7.452-.243-7.452-3.727 0-3.47 5.184-3.697 7.452-3.711l.297-.001h.132zm0 1.75c-2.792 0-6.12.34-6.12 1.962 0 1.585 3.13 1.955 5.864 1.976l.255.002c2.792 0 6.118-.34 6.118-1.958 0-1.638-3.326-1.982-6.118-1.982zm9.343-2.224c2.846.424 3.444 1.751 3.444 2.79 0 .636-.251 1.794-1.931 2.43a.882.882 0 01-1.137-.506.873.873 0 01.51-1.13c.796-.3.796-.633.796-.793 0-.511-.654-.868-1.944-1.06a.878.878 0 01-.741-.996.886.886 0 011.003-.735zm-17.685.735a.878.878 0 01-.742.997c-1.29.19-1.944.548-1.944 1.059 0 .16 0 .491.798.793a.873.873 0 01-.314 1.693.897.897 0 01-.313-.057C.25 16.259 0 15.1 0 14.466c0-1.037.598-2.366 3.446-2.79.485-.06.929.257 1.002.735zM12.789 0c2.96 0 5.368 2.392 5.368 5.33 0 2.94-2.407 5.331-5.368 5.331h-.031a5.329 5.329 0 01-3.782-1.57 5.253 5.253 0 01-1.553-3.764C7.423 2.392 9.83 0 12.789 0zm0 1.75c-1.987 0-3.604 1.607-3.604 3.58a3.526 3.526 0 001.04 2.527 3.58 3.58 0 002.535 1.054l.03.875v-.875c1.987 0 3.605-1.605 3.605-3.58S14.777 1.75 12.789 1.75zm7.27-.607a4.222 4.222 0 013.566 4.172c-.004 2.094-1.58 3.89-3.665 4.181a.88.88 0 01-.994-.745.875.875 0 01.75-.989 2.494 2.494 0 002.147-2.45 2.473 2.473 0 00-2.09-2.443.876.876 0 01-.726-1.005.881.881 0 011.013-.721zm-13.528.72a.876.876 0 01-.726 1.006 2.474 2.474 0 00-2.09 2.446A2.493 2.493 0 005.86 7.762a.875.875 0 11-.243 1.734c-2.085-.29-3.66-2.087-3.664-4.179 0-2.082 1.5-3.837 3.566-4.174a.876.876 0 011.012.72z" clipRule="evenodd" />
               </svg>
             </Link>
 
@@ -107,10 +121,10 @@ const Navbar = () => {
             <div className="relative">
               <button
                 onClick={() => setNotifyOpen(!notifyOpen)}
-                className="relative flex items-center justify-center w-10 h-10 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors"
+                className={`relative flex items-center justify-center w-10 h-10 rounded-lg ${darkMode ? "text-gray-400 hover:bg-gray-800 hover:text-gray-200" : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"} transition-colors`}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="22" fill="none" viewBox="0 0 20 22">
-                  <path fill="#000" fillOpacity=".6" fillRule="evenodd" d="M7.547 19.55c.533.59 1.218.915 1.93.915.714 0 1.403-.324 1.938-.916a.777.777 0 011.09-.056c.318.284.344.77.058 1.084-.832.917-1.927 1.423-3.086 1.423h-.002c-1.155-.001-2.248-.506-3.077-1.424a.762.762 0 01.057-1.083.774.774 0 011.092.057zM9.527 0c4.58 0 7.657 3.543 7.657 6.85 0 1.702.436 2.424.899 3.19.457.754.976 1.612.976 3.233-.36 4.14-4.713 4.478-9.531 4.478-4.818 0-9.172-.337-9.528-4.413-.003-1.686.515-2.544.973-3.299l.161-.27c.398-.679.737-1.417.737-2.918C1.871 3.543 4.948 0 9.528 0zm0 1.535c-3.6 0-6.11 2.802-6.11 5.316 0 2.127-.595 3.11-1.12 3.978-.422.697-.755 1.247-.755 2.444.173 1.93 1.455 2.944 7.986 2.944 6.494 0 7.817-1.06 7.988-3.01-.003-1.13-.336-1.681-.757-2.378-.526-.868-1.12-1.851-1.12-3.978 0-2.514-2.51-5.316-6.111-5.316z" clipRule="evenodd" />
+                  <path fill={darkMode ? "#9ca3af" : "#000"} fillOpacity={darkMode ? "1" : ".6"} fillRule="evenodd" d="M7.547 19.55c.533.59 1.218.915 1.93.915.714 0 1.403-.324 1.938-.916a.777.777 0 011.09-.056c.318.284.344.77.058 1.084-.832.917-1.927 1.423-3.086 1.423h-.002c-1.155-.001-2.248-.506-3.077-1.424a.762.762 0 01.057-1.083.774.774 0 011.092.057zM9.527 0c4.58 0 7.657 3.543 7.657 6.85 0 1.702.436 2.424.899 3.19.457.754.976 1.612.976 3.233-.36 4.14-4.713 4.478-9.531 4.478-4.818 0-9.172-.337-9.528-4.413-.003-1.686.515-2.544.973-3.299l.161-.27c.398-.679.737-1.417.737-2.918C1.871 3.543 4.948 0 9.528 0zm0 1.535c-3.6 0-6.11 2.802-6.11 5.316 0 2.127-.595 3.11-1.12 3.978-.422.697-.755 1.247-.755 2.444.173 1.93 1.455 2.944 7.986 2.944 6.494 0 7.817-1.06 7.988-3.01-.003-1.13-.336-1.681-.757-2.378-.526-.868-1.12-1.851-1.12-3.978 0-2.514-2.51-5.316-6.111-5.316z" clipRule="evenodd" />
                 </svg>
                 <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">
                   6
@@ -119,23 +133,29 @@ const Navbar = () => {
 
               {/* Notifications Dropdown */}
               {notifyOpen && (
-                <div className="absolute right-0 top-full mt-1 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                <div className={`absolute right-0 top-full mt-1 w-80 ${darkMode ? "bg-[#0f1c35]" : "bg-white"} rounded-lg shadow-lg border ${darkMode ? "border-gray-700" : "border-gray-200"} z-50`}>
                   {/* Header */}
-                  <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
-                    <h4 className="text-base font-semibold text-gray-800">Notifications</h4>
-                    <button className="p-1 hover:bg-gray-100 rounded">
-                      {/* svg three dots */}
+                  <div className={`flex items-center justify-between px-5 py-4 border-b ${darkMode ? "border-gray-700" : "border-gray-200"}`}>
+                    <h4 className={`text-base font-semibold ${darkMode ? "text-gray-100" : "text-gray-800"}`}>Notifications</h4>
+                    <button className={`p-1 ${darkMode ? "hover:bg-gray-800" : "hover:bg-gray-100"} rounded`}>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="4" fill="none" viewBox="0 0 16 4">
+                        <circle cx="2" cy="2" r="2" fill={darkMode ? "#9ca3af" : "#666"} />
+                        <circle cx="8" cy="2" r="2" fill={darkMode ? "#9ca3af" : "#666"} />
+                        <circle cx="14" cy="2" r="2" fill={darkMode ? "#9ca3af" : "#666"} />
+                      </svg>
                     </button>
                   </div>
 
                   {/* Tabs */}
-                  <div className="flex gap-2 px-5 py-3 border-b border-gray-200">
+                  <div className={`flex gap-2 px-5 py-3 border-b ${darkMode ? "border-gray-700" : "border-gray-200"}`}>
                     <button
                       onClick={() => setNotifyTab('all')}
                       className={`px-5 py-2 rounded-lg text-sm font-medium transition-colors ${
                         notifyTab === 'all' 
                           ? 'bg-blue-500 text-white' 
-                          : 'text-gray-600 hover:bg-gray-100'
+                          : darkMode 
+                            ? 'text-gray-400 hover:bg-gray-800' 
+                            : 'text-gray-600 hover:bg-gray-100'
                       }`}
                     >
                       All
@@ -145,7 +165,9 @@ const Navbar = () => {
                       className={`px-5 py-2 rounded-lg text-sm font-medium transition-colors ${
                         notifyTab === 'unread' 
                           ? 'bg-blue-500 text-white' 
-                          : 'text-gray-600 hover:bg-gray-100'
+                          : darkMode 
+                            ? 'text-gray-400 hover:bg-gray-800' 
+                            : 'text-gray-600 hover:bg-gray-100'
                       }`}
                     >
                       Unread
@@ -157,7 +179,7 @@ const Navbar = () => {
                     {notifications.map((notif) => (
                       <div 
                         key={notif.id} 
-                        className="flex gap-3 px-5 py-4 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-0"
+                        className={`flex gap-3 px-5 py-4 ${darkMode ? "hover:bg-gray-800/50" : "hover:bg-gray-50"} cursor-pointer border-b ${darkMode ? "border-gray-700/50" : "border-gray-100"} last:border-0`}
                       >
                         <img
                           src={notif.image}
@@ -165,10 +187,10 @@ const Navbar = () => {
                           className="w-11 h-11 rounded-full object-cover flex-shrink-0"
                         />
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm text-gray-700">
-                            <span className="font-semibold text-blue-600">{notif.name}</span> {notif.text}
+                          <p className={`text-sm ${darkMode ? "text-gray-300" : "text-gray-700"}`}>
+                            <span className="font-semibold text-blue-500">{notif.name}</span> {notif.text}
                           </p>
-                          <span className="text-xs text-gray-500 mt-1 inline-block">{notif.time}</span>
+                          <span className={`text-xs ${darkMode ? "text-gray-500" : "text-gray-500"} mt-1 inline-block`}>{notif.time}</span>
                         </div>
                       </div>
                     ))}
@@ -177,11 +199,11 @@ const Navbar = () => {
               )}
             </div>
 
-            {/*  */}
-            <Link to="#" className="relative flex items-center justify-center w-10 h-10 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-200 transition-colors">
+            {/* Messages */}
+            <Link to="#" className={`relative flex items-center justify-center w-10 h-10 rounded-lg ${darkMode ? "text-gray-400 hover:bg-gray-800 hover:text-gray-200" : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"} transition-colors`}>
               <svg xmlns="http://www.w3.org/2000/svg" width="23" height="22" fill="none" viewBox="0 0 23 22">
-										<path fill="#000" fillOpacity=".6" fillRule="evenodd" d="M11.43 0c2.96 0 5.743 1.143 7.833 3.22 4.32 4.29 4.32 11.271 0 15.562C17.145 20.886 14.293 22 11.405 22c-1.575 0-3.16-.33-4.643-1.012-.437-.174-.847-.338-1.14-.338-.338.002-.793.158-1.232.308-.9.307-2.022.69-2.852-.131-.826-.822-.445-1.932-.138-2.826.152-.44.307-.895.307-1.239 0-.282-.137-.642-.347-1.161C-.57 11.46.322 6.47 3.596 3.22A11.04 11.04 0 0111.43 0zm0 1.535A9.5 9.5 0 004.69 4.307a9.463 9.463 0 00-1.91 10.686c.241.592.474 1.17.474 1.77 0 .598-.207 1.201-.39 1.733-.15.439-.378 1.1-.231 1.245.143.147.813-.085 1.255-.235.53-.18 1.133-.387 1.73-.391.597 0 1.161.225 1.758.463 3.655 1.679 7.98.915 10.796-1.881 3.716-3.693 3.716-9.7 0-13.391a9.5 9.5 0 00-6.74-2.77zm4.068 8.867c.57 0 1.03.458 1.03 1.024 0 .566-.46 1.023-1.03 1.023a1.023 1.023 0 11-.01-2.047h.01zm-4.131 0c.568 0 1.03.458 1.03 1.024 0 .566-.462 1.023-1.03 1.023a1.03 1.03 0 01-1.035-1.024c0-.566.455-1.023 1.025-1.023h.01zm-4.132 0c.568 0 1.03.458 1.03 1.024 0 .566-.462 1.023-1.03 1.023a1.022 1.022 0 11-.01-2.047h.01z" clipRule="evenodd" />
-									</svg> 
+                <path fill={darkMode ? "#9ca3af" : "#000"} fillOpacity={darkMode ? "1" : ".6"} fillRule="evenodd" d="M11.43 0c2.96 0 5.743 1.143 7.833 3.22 4.32 4.29 4.32 11.271 0 15.562C17.145 20.886 14.293 22 11.405 22c-1.575 0-3.16-.33-4.643-1.012-.437-.174-.847-.338-1.14-.338-.338.002-.793.158-1.232.308-.9.307-2.022.69-2.852-.131-.826-.822-.445-1.932-.138-2.826.152-.44.307-.895.307-1.239 0-.282-.137-.642-.347-1.161C-.57 11.46.322 6.47 3.596 3.22A11.04 11.04 0 0111.43 0zm0 1.535A9.5 9.5 0 004.69 4.307a9.463 9.463 0 00-1.91 10.686c.241.592.474 1.17.474 1.77 0 .598-.207 1.201-.39 1.733-.15.439-.378 1.1-.231 1.245.143.147.813-.085 1.255-.235.53-.18 1.133-.387 1.73-.391.597 0 1.161.225 1.758.463 3.655 1.679 7.98.915 10.796-1.881 3.716-3.693 3.716-9.7 0-13.391a9.5 9.5 0 00-6.74-2.77zm4.068 8.867c.57 0 1.03.458 1.03 1.024 0 .566-.46 1.023-1.03 1.023a1.023 1.023 0 11-.01-2.047h.01zm-4.131 0c.568 0 1.03.458 1.03 1.024 0 .566-.462 1.023-1.03 1.023a1.03 1.03 0 01-1.035-1.024c0-.566.455-1.023 1.025-1.023h.01zm-4.132 0c.568 0 1.03.458 1.03 1.024 0 .566-.462 1.023-1.03 1.023a1.022 1.022 0 11-.01-2.047h.01z" clipRule="evenodd" />
+              </svg> 
               <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">
                 2
               </span>
@@ -191,24 +213,24 @@ const Navbar = () => {
             <div className="relative ml-2">
               <button
                 onClick={() => setProfileOpen(!profileOpen)}
-                className="flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg px-2 py-1.5 transition-colors"
+                className={`flex items-center gap-2 ${darkMode ? "hover:bg-gray-800" : "hover:bg-gray-50"} rounded-lg px-2 py-1.5 transition-colors`}
               >
                 <img
                   src={user?.image || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop"}
                   alt={user?.firstName || "User"}
                   className="w-7 h-7 rounded-full object-cover border border-gray-300"
                 />
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300 hidden sm:block">{user?.firstName || "User"}</span>
-                <svg className="w-4 h-4 text-gray-500 dark:text-gray-400 hidden sm:block" fill="currentColor" viewBox="0 0 24 24">
+                <span className={`text-sm font-medium ${darkMode ? "text-gray-300" : "text-gray-700"} hidden sm:block`}>{user?.firstName || "User"}</span>
+                <svg className={`w-4 h-4 ${darkMode ? "text-gray-400" : "text-gray-500"} hidden sm:block`} fill="currentColor" viewBox="0 0 24 24">
                   <path d="M7 10l5 5 5-5z" />
                 </svg>
               </button>
 
               {/* Profile Dropdown Menu */}
               {profileOpen && (
-                <div className="absolute right-0 top-full mt-2 w-64 bg-white dark:bg-gray-900 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-50 overflow-hidden">
+                <div className={`absolute right-0 top-full mt-2 w-64 ${darkMode ? "bg-[#0f1c35]" : "bg-white"} rounded-xl shadow-xl border ${darkMode ? "border-gray-700" : "border-gray-200"} z-50 overflow-hidden`}>
                   {/* Profile Info */}
-                  <div className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-gray-800 dark:to-gray-700 px-4 py-4 border-b border-gray-200 dark:border-gray-700">
+                  <div className={`${darkMode ? "bg-gradient-to-r from-gray-800 to-gray-700" : "bg-gradient-to-r from-blue-50 to-blue-100"} px-4 py-4 border-b ${darkMode ? "border-gray-700" : "border-gray-200"}`}>
                     <div className="flex items-center gap-3">
                       <img
                         src={user?.image || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop"}
@@ -216,8 +238,8 @@ const Navbar = () => {
                         className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-md"
                       />
                       <div className="flex-1">
-                        <h4 className="text-sm font-bold text-gray-800 dark:text-gray-100">{user?.firstName} {user?.lastName}</h4>
-                        <Link to="/profile" className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium transition-colors">
+                        <h4 className={`text-sm font-bold ${darkMode ? "text-gray-100" : "text-gray-800"}`}>{user?.firstName} {user?.lastName}</h4>
+                        <Link to="/my-profile" className={`text-xs ${darkMode ? "text-blue-400 hover:text-blue-300" : "text-blue-600 hover:text-blue-700"} font-medium transition-colors`}>
                           View Profile →
                         </Link>
                       </div>
@@ -229,16 +251,16 @@ const Navbar = () => {
                     {/* Settings */}
                     <Link
                       to="/settings"
-                      className="flex items-center justify-between px-4 py-3 hover:bg-blue-50 dark:hover:bg-gray-800 transition-all duration-200 group border-l-4 border-transparent hover:border-blue-500"
+                      className={`flex items-center justify-between px-4 py-3 ${darkMode ? "hover:bg-gray-800" : "hover:bg-blue-50"} transition-all duration-200 group border-l-4 border-transparent hover:border-blue-500`}
                     >
                       <div className="flex items-center gap-3">
-                        <svg className="w-5 h-5 text-gray-600 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className={`w-5 h-5 ${darkMode ? "text-gray-400 group-hover:text-blue-400" : "text-gray-600 group-hover:text-blue-600"} transition-colors`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
-                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-gray-200 transition-colors">Settings</span>
+                        <span className={`text-sm font-medium ${darkMode ? "text-gray-300 group-hover:text-gray-200" : "text-gray-700 group-hover:text-gray-900"} transition-colors`}>Settings</span>
                       </div>
-                      <svg className="w-4 h-4 text-gray-400 dark:text-gray-500 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className={`w-4 h-4 ${darkMode ? "text-gray-500 group-hover:text-blue-400" : "text-gray-400 group-hover:text-blue-500"} transition-colors transform group-hover:translate-x-1`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
                     </Link>
@@ -246,34 +268,34 @@ const Navbar = () => {
                     {/* Help & Support */}
                     <Link
                       to="/help"
-                      className="flex items-center justify-between px-4 py-3 hover:bg-blue-50 dark:hover:bg-gray-800 transition-all duration-200 group border-l-4 border-transparent hover:border-blue-500"
+                      className={`flex items-center justify-between px-4 py-3 ${darkMode ? "hover:bg-gray-800" : "hover:bg-blue-50"} transition-all duration-200 group border-l-4 border-transparent hover:border-blue-500`}
                     >
                       <div className="flex items-center gap-3">
-                        <svg className="w-5 h-5 text-gray-600 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className={`w-5 h-5 ${darkMode ? "text-gray-400 group-hover:text-blue-400" : "text-gray-600 group-hover:text-blue-600"} transition-colors`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-gray-200 transition-colors">Help & Support</span>
+                        <span className={`text-sm font-medium ${darkMode ? "text-gray-300 group-hover:text-gray-200" : "text-gray-700 group-hover:text-gray-900"} transition-colors`}>Help & Support</span>
                       </div>
-                      <svg className="w-4 h-4 text-gray-400 dark:text-gray-500 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className={`w-4 h-4 ${darkMode ? "text-gray-500 group-hover:text-blue-400" : "text-gray-400 group-hover:text-blue-500"} transition-colors transform group-hover:translate-x-1`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
                     </Link>
                     
                     {/* Divider */}
-                    <div className="my-1 border-t border-gray-200 dark:border-gray-700" />
+                    <div className={`my-1 border-t ${darkMode ? "border-gray-700" : "border-gray-200"}`} />
                     
                     {/* Log Out */}
                     <button
                       onClick={handleLogout}
-                      className="w-full flex items-center justify-between px-4 py-3 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-200 group border-l-4 border-transparent hover:border-red-500"
+                      className={`w-full flex items-center justify-between px-4 py-3 ${darkMode ? "hover:bg-red-900/20" : "hover:bg-red-50"} transition-all duration-200 group border-l-4 border-transparent hover:border-red-500`}
                     >
                       <div className="flex items-center gap-3">
-                        <svg className="w-5 h-5 text-gray-600 dark:text-gray-400 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className={`w-5 h-5 ${darkMode ? "text-gray-400 group-hover:text-red-400" : "text-gray-600 group-hover:text-red-600"} transition-colors`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                         </svg>
-                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">Log Out</span>
+                        <span className={`text-sm font-medium ${darkMode ? "text-gray-300 group-hover:text-red-400" : "text-gray-700 group-hover:text-red-600"} transition-colors`}>Log Out</span>
                       </div>
-                      <svg className="w-4 h-4 text-gray-400 dark:text-gray-500 group-hover:text-red-500 dark:group-hover:text-red-400 transition-colors transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className={`w-4 h-4 ${darkMode ? "text-gray-500 group-hover:text-red-400" : "text-gray-400 group-hover:text-red-500"} transition-colors transform group-hover:translate-x-1`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
                     </button>
@@ -305,15 +327,6 @@ const Navbar = () => {
 													</svg>													  
 												</Link>
 											</form>
-											{/* <!-- <div className="_header_mobile_toggle">
-												<form action="/mobileMenu.html">
-													<button type="submit" className="_header_mobile_btn_link" value="go to mobile menu">
-														<svg xmlns="http://www.w3.org/2000/svg" width="18" height="14" fill="none" viewBox="0 0 18 14">
-															<path stroke="#666" strokeLinecap="round" strokeWidth="1.5" d="M1 1h16M1 7h16M1 13h16"/>
-														</svg>													  
-													</button>
-												</form>
-											</div> --> */}
 										</div>
 									</div>
 								</div>
@@ -374,7 +387,7 @@ const Navbar = () => {
 												<g opacity=".6">
 												  <path className="_mobile_svg1 _dark_svg" stroke="#000" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M23.999 24.5v-2.333a4.667 4.667 0 00-4.667-4.667H9.999a4.667 4.667 0 00-4.667 4.667V24.5M14.667 12.833a4.667 4.667 0 100-9.333 4.667 4.667 0 000 9.333z"/>
 												</g>
-											</svg>											  
+											</svg>
 										</a>
 									</li>
 								</ul>

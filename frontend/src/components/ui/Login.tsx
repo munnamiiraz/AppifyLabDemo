@@ -44,9 +44,9 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="_layout _layout_main_wrapper">
-      <div className="_main_layout" style={{ paddingTop: '0px' }}>
-        <section className="_social_login_wrapper">
+    <div className="_layout _layout_main_wrapper" style={{ height: 'auto', overflow: 'visible' }}>
+      <div className="_main_layout" style={{ height: 'auto', overflow: 'visible' }}>
+        <section className="_social_login_wrapper" style={{ height: 'auto', overflow: 'visible' }}>
           <div className="_shape_one">
             <img src={Shape1} alt="" className="_shape_img" />
             <img src={DarkShape} alt="" className="_dark_shape" />

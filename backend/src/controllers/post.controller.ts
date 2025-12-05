@@ -106,7 +106,9 @@ export const createPost = async (req: AuthFileRequest, res: Response) => {
               firstName: true,
               lastName: true,
               email: true,
-              image: true,
+              profileImage: true,
+coverImage: true,
+
             }
           }
         },
@@ -125,10 +127,20 @@ export const createPost = async (req: AuthFileRequest, res: Response) => {
 
 export const getPosts = async (req: Request, res: Response) => {
   try {
+    const userId = (req as any).user?.id; 
+    console.log("Authenticated user:", userId);
+
+    const where = userId
+      ? {
+          OR: [
+            { isPrivate: false },
+            { AND: [{ isPrivate: true }, { authorId: userId }] }
+          ]
+        }
+      : { isPrivate: false };
+
     const posts = await prisma.post.findMany({
-      where: {
-        isPrivate: false,
-      },
+      where,
       include: {
         media: true,
         author: {
@@ -137,7 +149,9 @@ export const getPosts = async (req: Request, res: Response) => {
             firstName: true,
             lastName: true,
             email: true,
-            image: true,
+            profileImage: true,
+coverImage: true,
+
           },
         },
         likes: {
@@ -148,82 +162,30 @@ export const getPosts = async (req: Request, res: Response) => {
                 firstName: true,
                 lastName: true,
                 email: true,
-                image: true,
+                profileImage: true,
+coverImage: true,
+
               },
             },
           },
-          orderBy: {
-            createdAt: 'desc',
-          },
+          orderBy: { createdAt: 'desc' },
         },
         comments: {
           include: {
-            author: {
-              select: {
-                id: true,
-                firstName: true,
-                lastName: true,
-                email: true,
-                image: true,
-              },
-            },
-            likes: {
-              include: {
-                user: {
-                  select: {
-                    id: true,
-                    firstName: true,
-                    lastName: true,
-                    email: true,
-                    image: true,
-                  },
-                },
-              },
-              orderBy: {
-                createdAt: 'desc',
-              },
-            },
+            author: true,
+            likes: { include: { user: true }, orderBy: { createdAt: 'desc' } },
             replies: {
               include: {
-                author: {
-                  select: {
-                    id: true,
-                    firstName: true,
-                    lastName: true,
-                    email: true,
-                    image: true,
-                  },
-                },
-                likes: {
-                  include: {
-                    user: {
-                      select: {
-                        id: true,
-                        firstName: true,
-                        lastName: true,
-                        email: true,
-                        image: true,
-                      },
-                    },
-                  },
-                  orderBy: {
-                    createdAt: 'desc',
-                  },
-                },
+                author: true,
+                likes: { include: { user: true }, orderBy: { createdAt: 'desc' } },
               },
-              orderBy: {
-                createdAt: 'asc',
-              },
+              orderBy: { createdAt: 'asc' },
             },
           },
-          orderBy: {
-            createdAt: 'desc',
-          },
+          orderBy: { createdAt: 'desc' },
         },
       },
-      orderBy: {
-        createdAt: 'desc',
-      },
+      orderBy: { createdAt: 'desc' },
     });
 
     const postsWithCounts = posts.map(post => ({
@@ -241,18 +203,157 @@ export const getPosts = async (req: Request, res: Response) => {
       })),
     }));
 
-    return res.status(200).json({ 
-      message: 'Posts retrieved successfully', 
-      posts: postsWithCounts 
+    return res.status(200).json({
+      message: 'Posts retrieved successfully',
+      posts: postsWithCounts,
     });
+
   } catch (err: any) {
     console.error('getPosts error:', err);
-    return res.status(500).json({ 
-      message: 'Failed to retrieve posts', 
-      error: err?.message ?? String(err) 
+    return res.status(500).json({
+      message: 'Failed to retrieve posts',
+      error: err?.message ?? String(err),
     });
   }
 };
+
+export const getMyPosts = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user?.id;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const posts = await prisma.post.findMany({
+      where: {
+        authorId: userId,   // <= Only YOUR posts
+      },
+      include: {
+        media: true,
+        author: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            profileImage: true,
+coverImage: true,
+
+          },
+        },
+        likes: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+                profileImage: true,
+coverImage: true,
+
+              },
+            },
+          },
+          orderBy: { createdAt: "desc" },
+        },
+        comments: {
+          include: {
+            author: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+                profileImage: true,
+coverImage: true,
+
+              },
+            },
+            likes: {
+              include: {
+                user: {
+                  select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                    email: true,
+                    profileImage: true,
+coverImage: true,
+
+                  },
+                },
+              },
+              orderBy: { createdAt: "desc" },
+            },
+            replies: {
+              include: {
+                author: {
+                  select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                    email: true,
+                    profileImage: true,
+coverImage: true,
+
+                  },
+                },
+                likes: {
+                  include: {
+                    user: {
+                      select: {
+                        id: true,
+                        firstName: true,
+                        lastName: true,
+                        email: true,
+                        profileImage: true,
+coverImage: true,
+
+                      },
+                    },
+                  },
+                  orderBy: { createdAt: "desc" },
+                },
+              },
+              orderBy: { createdAt: "asc" },
+            },
+          },
+          orderBy: { createdAt: "desc" },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    const postsWithCounts = posts.map((post) => ({
+      ...post,
+      likesCount: post.likes.length,
+      commentsCount: post.comments.length,
+      comments: post.comments.map((comment) => ({
+        ...comment,
+        likesCount: comment.likes.length,
+        repliesCount: comment.replies.length,
+        replies: comment.replies.map((reply) => ({
+          ...reply,
+          likesCount: reply.likes.length,
+        })),
+      })),
+    }));
+
+    return res.status(200).json({
+      message: "Your posts retrieved successfully",
+      posts: postsWithCounts,
+    });
+  } catch (err: any) {
+    console.error("getMyPosts error:", err);
+    return res.status(500).json({
+      message: "Failed to retrieve your posts",
+      error: err?.message ?? String(err),
+    });
+  }
+};
+
 
 export const getPostById = async (req: Request, res: Response) => {
   try {
@@ -268,7 +369,9 @@ export const getPostById = async (req: Request, res: Response) => {
             firstName: true,
             lastName: true,
             email: true,
-            image: true,
+            profileImage: true,
+coverImage: true,
+
           },
         },
         likes: {
@@ -279,7 +382,9 @@ export const getPostById = async (req: Request, res: Response) => {
                 firstName: true,
                 lastName: true,
                 email: true,
-                image: true,
+                profileImage: true,
+coverImage: true,
+
               },
             },
           },
@@ -292,7 +397,9 @@ export const getPostById = async (req: Request, res: Response) => {
                 firstName: true,
                 lastName: true,
                 email: true,
-                image: true,
+                profileImage: true,
+coverImage: true,
+
               },
             },
             likes: {
@@ -303,7 +410,9 @@ export const getPostById = async (req: Request, res: Response) => {
                     firstName: true,
                     lastName: true,
                     email: true,
-                    image: true,
+                    profileImage: true,
+coverImage: true,
+
                   },
                 },
               },
@@ -316,7 +425,9 @@ export const getPostById = async (req: Request, res: Response) => {
                     firstName: true,
                     lastName: true,
                     email: true,
-                    image: true,
+                    profileImage: true,
+coverImage: true,
+
                   },
                 },
                 likes: {
@@ -327,7 +438,9 @@ export const getPostById = async (req: Request, res: Response) => {
                         firstName: true,
                         lastName: true,
                         email: true,
-                        image: true,
+                        profileImage: true,
+coverImage: true,
+
                       },
                     },
                   },
@@ -490,7 +603,9 @@ export const updatePost = async (req: AuthFileRequest, res: Response) => {
               firstName: true,
               lastName: true,
               email: true,
-              image: true,
+              profileImage: true,
+coverImage: true,
+
             }
           }
         },
@@ -669,7 +784,9 @@ export const createComment = async (req: Request, res: Response) => {
             id: true,
             firstName: true,
             lastName: true,
-            image: true
+            profileImage: true,
+            coverImage: true,
+
           }
         },
         likes: true,
@@ -680,7 +797,9 @@ export const createComment = async (req: Request, res: Response) => {
                 id: true,
                 firstName: true,
                 lastName: true,
-                image: true
+                profileImage: true,
+                coverImage: true,
+
               }
             },
             likes: true
@@ -728,7 +847,9 @@ export const getComments = async (req: Request, res: Response) => {
               id: true,
               firstName: true,
               lastName: true,
-              image: true
+              profileImage: true,
+              coverImage: true,
+
             }
           },
           likes: true,
@@ -739,7 +860,9 @@ export const getComments = async (req: Request, res: Response) => {
                   id: true,
                   firstName: true,
                   lastName: true,
-                  image: true
+                  profileImage: true,
+                  coverImage: true,
+
                 }
               },
               likes: true
@@ -806,7 +929,9 @@ export const updateComment = async (req: Request, res: Response) => {
             id: true,
             firstName: true,
             lastName: true,
-            image: true
+            profileImage: true,
+            coverImage: true,
+
           }
         },
         likes: true,
@@ -817,7 +942,9 @@ export const updateComment = async (req: Request, res: Response) => {
                 id: true,
                 firstName: true,
                 lastName: true,
-                image: true
+                profileImage: true,
+                coverImage: true,
+
               }
             },
             likes: true
@@ -910,7 +1037,9 @@ export const createReply = async (req: Request, res: Response) => {
             id: true,
             firstName: true,
             lastName: true,
-            image: true
+            profileImage: true,
+            coverImage: true,
+
           }
         },
         likes: true
@@ -951,7 +1080,9 @@ export const getReplies = async (req: Request, res: Response) => {
             id: true,
             firstName: true,
             lastName: true,
-            image: true
+            profileImage: true,
+            coverImage: true,
+
           }
         },
         likes: true
@@ -1005,7 +1136,9 @@ export const updateReply = async (req: Request, res: Response) => {
             id: true,
             firstName: true,
             lastName: true,
-            image: true
+            profileImage: true,
+            coverImage: true,
+
           }
         },
         likes: true
@@ -1257,7 +1390,9 @@ export const getPostLikes = async (req: Request, res: Response): Promise<void> =
             id: true,
             firstName: true,
             lastName: true,
-            image: true
+            profileImage: true,
+            coverImage: true,
+
           }
         }
       }
@@ -1300,7 +1435,9 @@ export const getPostComments = async (req: Request, res: Response): Promise<void
             id: true,
             firstName: true,
             lastName: true,
-            image: true,
+            profileImage: true,
+coverImage: true,
+
           },
         },
         replies: {
@@ -1311,7 +1448,9 @@ export const getPostComments = async (req: Request, res: Response): Promise<void
                 id: true,
                 firstName: true,
                 lastName: true,
-                image: true,
+                profileImage: true,
+coverImage: true,
+
               },
             },
           },

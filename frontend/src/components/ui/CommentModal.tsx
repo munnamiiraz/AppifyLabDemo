@@ -41,7 +41,6 @@ const CommentsModal = ({ postId, onClose }: CommentsModalProps) => {
   const [comments, setComments] = useState<Comment[]>([])
   const [loading, setLoading] = useState(true)
   const [commentText, setCommentText] = useState('')
-  const [total, setTotal] = useState(0)
   const [replyTexts, setReplyTexts] = useState<{ [key: string]: string }>({})
   const [showReplyBox, setShowReplyBox] = useState<{ [key: string]: boolean }>({})
 
@@ -62,7 +61,6 @@ const CommentsModal = ({ postId, onClose }: CommentsModalProps) => {
       
       if (response.data.success) {
         setComments(response.data.comments)
-        setTotal(response.data.pagination.total)
       }
       setLoading(false)
     } catch (error) {
@@ -103,7 +101,7 @@ const CommentsModal = ({ postId, onClose }: CommentsModalProps) => {
       if (response.data.success) {
         setReplyTexts(prev => ({ ...prev, [commentId]: '' }))
         setShowReplyBox(prev => ({ ...prev, [commentId]: false }))
-        fetchComments() // Refresh comments to show new reply
+        fetchComments()
       }
     } catch (error) {
       console.error('Failed to post reply:', error)
@@ -126,11 +124,59 @@ const CommentsModal = ({ postId, onClose }: CommentsModalProps) => {
       
       if (response.data.success) {
         setCommentText('')
-        fetchComments() // Refresh comments to show new comment
+        fetchComments()
       }
     } catch (error) {
       console.error('Failed to post comment:', error)
     }
+  }
+
+  const handleLikeComment = async (commentId: string) => {
+    try {
+      const res = await axios.post(
+        `http://localhost:9000/api/posts/comments/${commentId}/like`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          }
+        }
+      )
+      
+      if (res.data.success) {
+        fetchComments()
+      }
+    } catch (error) {
+      console.error('Failed to like comment:', error)
+    }
+  }
+
+  const handleLikeReply = async (replyId: string) => {
+    try {
+      const res = await axios.post(
+        `http://localhost:9000/api/posts/replies/${replyId}/like`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          }
+        }
+      )
+      
+      if (res.data.success) {
+        fetchComments()
+      }
+    } catch (error) {
+      console.error('Failed to like reply:', error)
+    }
+  }
+
+  const getTotalCount = () => {
+    let total = comments.length
+    comments.forEach(comment => {
+      total += comment.replies.length
+    })
+    return total
   }
 
   return (
@@ -165,7 +211,7 @@ const CommentsModal = ({ postId, onClose }: CommentsModalProps) => {
           alignItems: 'center'
         }}>
           <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '600' }}>
-            Comments ({total})
+            Comments ({getTotalCount()})
           </h3>
           <button 
             onClick={onClose}
@@ -248,7 +294,12 @@ const CommentsModal = ({ postId, onClose }: CommentsModalProps) => {
                       fontSize: '12px',
                       color: '#65676b'
                     }}>
-                      <span style={{ cursor: 'pointer', fontWeight: '600' }}>Like</span>
+                      <span 
+                        style={{ cursor: 'pointer', fontWeight: '600' }}
+                        onClick={() => handleLikeComment(comment.id)}
+                      >
+                        Like
+                      </span>
                       <span 
                         style={{ cursor: 'pointer', fontWeight: '600' }}
                         onClick={() => setShowReplyBox(prev => ({ ...prev, [comment.id]: !prev[comment.id] }))}
@@ -345,9 +396,17 @@ const CommentsModal = ({ postId, onClose }: CommentsModalProps) => {
                                 fontSize: '12px',
                                 color: '#65676b'
                               }}>
-                                <span style={{ cursor: 'pointer', fontWeight: '600' }}>Like</span>
+                                <span 
+                                  style={{ cursor: 'pointer', fontWeight: '600' }}
+                                  onClick={() => handleLikeReply(reply.id)}
+                                >
+                                  Like
+                                </span>
                                 <span style={{ cursor: 'pointer', fontWeight: '600' }}>Reply</span>
                                 <span>{getTimeAgo(reply.createdAt)}</span>
+                                {reply.likesCount > 0 && (
+                                  <span>{reply.likesCount} likes</span>
+                                )}
                               </div>
                             </div>
                           </div>

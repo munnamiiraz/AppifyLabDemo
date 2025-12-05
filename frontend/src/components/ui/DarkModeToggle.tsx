@@ -17,6 +17,7 @@ const DarkModeToggle = () => {
     const newDarkMode = !darkMode;
     setDarkMode(newDarkMode);
     localStorage.setItem('darkMode', newDarkMode.toString());
+    window.dispatchEvent(new Event('darkModeChange'));
     const layout = document.querySelector('._layout_main_wrapper');
     if (layout) {
       if (newDarkMode) {

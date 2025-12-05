@@ -16,6 +16,8 @@ import "./assets/css/responsive.css"
 import LeftSidebar from './components/ui/LeftSidebar'
 import LayoutMiddle from './components/ui/LayoutMiddle'
 import RightSidebar from './components/ui/RightSidebar'
+import MyProfile from './components/ui/MyProfile'
+
 import DarkModeToggle from './components/ui/DarkModeToggle'
 
 
@@ -72,6 +74,16 @@ function App() {
         
         <Route path="/login" element={<AuthLayout><Login /></AuthLayout>} />
         <Route path="/register" element={<AuthLayout><Registration /></AuthLayout>} />
+        <Route path="/my-profile" element={
+          <ProtectedRoute>
+            <div>
+              <DarkModeToggle />
+              <Navbar />
+              <MyProfile />
+            </div>
+          </ProtectedRoute>
+        } />
+        
       </Routes>
     </Router>
   )

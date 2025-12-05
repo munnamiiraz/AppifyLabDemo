@@ -6,6 +6,7 @@ export const getPostApi = baseApi.injectEndpoints({
     getPosts: builder.query<GetPostsResponse, void>({
       query: () => ({
         url: '/user/get-posts',
+
         method: 'GET',
       }),
       providesTags: ['Posts'],

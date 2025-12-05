@@ -8,22 +8,31 @@ datasource db {
 }
 
 model User {
-  id         String    @id @default(uuid())
-  firstName  String
-  lastName   String
-  email      String    @unique
-  image      String?
-  password   String
-  posts      Post[]
-  likes      Like[]
-  comments   Comment[]   // top-level comments
-  replies    Reply[]     // replies authored by user
-  createdAt  DateTime  @default(now())
+  id            String   @id @default(uuid())
+  firstName     String
+  lastName      String
+  username      String?  @unique      // make optional
+  email         String   @unique
+  password      String
+
+  profileImage  String?                // optional
+  coverImage    String?                // optional
+  bio           String?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  posts         Post[]
+  likes         Like[]
+  comments      Comment[]
+  replies       Reply[]
 }
+
+
 
 model Post {
   id            String       @id @default(uuid())
-  author        User         @relation(fields: [authorId], references: [id])
+  author        User         @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId      String
   content       String?
   isPrivate     Boolean      @default(false)
@@ -48,9 +57,9 @@ model PostMedia {
 
 model Comment {
   id        String   @id @default(uuid())
-  post      Post     @relation(fields: [postId], references: [id])
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId    String
-  author    User     @relation(fields: [authorId], references: [id])
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId  String
   content   String
   likes     Like[]
@@ -63,9 +72,9 @@ model Comment {
 
 model Reply {
   id        String   @id @default(uuid())
-  author    User     @relation(fields: [authorId], references: [id])
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId  String
-  comment   Comment  @relation("CommentReplies", fields: [commentId], references: [id])
+  comment   Comment  @relation("CommentReplies", fields: [commentId], references: [id], onDelete: Cascade)
   commentId String
   content   String
   likes     Like[]

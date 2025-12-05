@@ -35,6 +35,7 @@ const Registration: React.FC = () => {
 
   const handleGoogleSignUp = () => {
     console.log('Google sign-up clicked');
+    alert('This is not available for now.');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -57,16 +58,16 @@ const Registration: React.FC = () => {
       console.log('Sign-up successful:', result);
       dispatch(setCredentials({ user: result.user, token: result.token }));
       // Navigate to feed after successful registration
-      navigate('/');
+      navigate('/login');
     } catch (err) {
       console.error('Sign-up failed:', err);
     }
   };
 
   return (
-    <div className="_layout _layout_main_wrapper">
-      <div className="_main_layout" style={{ paddingTop: '0px' }}>
-        <section className="_social_registration_wrapper">
+    <div className="_layout _layout_main_wrapper" style={{ height: 'auto', overflow: 'visible' }}>
+      <div className="_main_layout" style={{ height: 'auto', overflow: 'visible' }}>
+        <section className="_social_registration_wrapper" style={{ height: 'auto', overflow: 'visible' }}>
           <div className="_shape_one">
             <img src={Shape1} alt="" className="_shape_img" />
             <img src={DarkShape} alt="" className="_dark_shape" />

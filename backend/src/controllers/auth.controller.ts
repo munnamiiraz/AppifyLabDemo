@@ -38,7 +38,7 @@ export const signUp = async (req: Request, res: Response): Promise<void> => {
     const hashedPassword: string = await bcrypt.hash(password, salt);
 
     const user = await prisma.user.findUnique({
-      where: {email: email}
+      where: {email}
     })
 
     if(user) {

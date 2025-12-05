@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import {  getUser } from '../controllers/user.controller';
 import {protect} from '../middleware/auth.middleware';
-import { createPost, getPosts, deletePost, editPost} from '../controllers/user.controller';
+import { createPost, deletePost, editPost} from '../controllers/user.controller';
+import { getPosts } from '../controllers/post.controller';
 import { upload } from '../config/multer';
 
 const router = Router();
