@@ -31,7 +31,7 @@ export default function ImojiPicker({ post }: PostProps) {
     setLikeCount(prev => newState ? prev + 1 : prev - 1);
 
     try {
-      await axios.post(`/api/posts/${post.id}/like`);
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/posts/${post.id}/like`);
     } catch (err) {
       setLiked(!newState);
       setLikeCount(prev => newState ? prev - 1 : prev + 1);
