@@ -18,8 +18,10 @@ const port = process.env.PORT || 9000;
 
 // Middleware
 app.use(cors({
-  origin: process.env.HOST_URL || "*"
+  origin: process.env.CORS_ORIGIN?.split(',') || '*',
+  credentials: true
 }));
+app.options('*', cors());
 
 app.use(helmet());
 app.use(express.json());

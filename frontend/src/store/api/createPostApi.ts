@@ -1,11 +1,9 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
-const API_BASE_URL = 'http://localhost:9000/api'
-
 export const createPostApi = createApi({
   reducerPath: 'createPostApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: API_BASE_URL,
+    baseUrl: `${import.meta.env.VITE_API_URL}/api`,
     prepareHeaders: (headers) => {
       const token = localStorage.getItem('token')
       if (token) {
@@ -18,7 +16,7 @@ export const createPostApi = createApi({
   endpoints: (builder) => ({
     createPost: builder.mutation<any, FormData>({
       query: (formData) => ({
-        url: '/user/post',
+        url: '/posts',
         method: 'POST',
         body: formData,
       }),
