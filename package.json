@@ -1,0 +1,8 @@
+{
+  "name": "appifylab-demo-task",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "vercel-build": "cd backend && npm install && npm run vercel-build"
+  }
+}
