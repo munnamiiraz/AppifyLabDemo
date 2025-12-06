@@ -1,16 +1,10 @@
 {
-  "version": 2,
   "buildCommand": "cd backend && npm install && npm run vercel-build",
-  "builds": [
+  "installCommand": "cd backend && npm install",
+  "rewrites": [
     {
-      "src": "backend/api/index.ts",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "backend/api/index.ts"
+      "source": "/(.*)",
+      "destination": "/api"
     }
   ]
 }

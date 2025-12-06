@@ -2,14 +2,14 @@ import express, { Application } from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import helmet from 'helmet';
-import { connectDB } from '../src/config/prisma';
-import { errorHandler } from '../src/middleware/errorHandler';
-import { notFound } from '../src/middleware/notFound';
-import userRoutes from '../src/routes/user.routes';
-import authRoutes from '../src/routes/auth.routes';
-import uploadRoutes from '../src/routes/upload.route';
-import postRoutes from '../src/routes/post.route';
-import replyRoutes from '../src/routes/reply.routes';
+import { connectDB } from '../backend/src/config/prisma';
+import { errorHandler } from '../backend/src/middleware/errorHandler';
+import { notFound } from '../backend/src/middleware/notFound';
+import userRoutes from '../backend/src/routes/user.routes';
+import authRoutes from '../backend/src/routes/auth.routes';
+import uploadRoutes from '../backend/src/routes/upload.route';
+import postRoutes from '../backend/src/routes/post.route';
+import replyRoutes from '../backend/src/routes/reply.routes';
 
 dotenv.config();
 
