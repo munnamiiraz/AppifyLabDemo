@@ -1,10 +1,11 @@
 node_modules
-.env
 .env.local
 .env.*.local
+src
 *.md
 .eslintrc.json
 .prettierrc
 nodemon.json
+tsconfig.json
 .git
 .gitignore
