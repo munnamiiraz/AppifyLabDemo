@@ -1,15 +1,17 @@
 {
   "version": 2,
+  "buildCommand": "cd backend && npm install && npm run build",
+  "outputDirectory": "backend/dist",
   "builds": [
     {
-      "src": "src/index.ts",
+      "src": "backend/src/index.ts",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "src/index.ts"
+      "dest": "backend/src/index.ts"
     }
   ]
 }

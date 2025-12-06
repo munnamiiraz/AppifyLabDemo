@@ -3,14 +3,14 @@
   "buildCommand": "cd backend && npm install && npm run vercel-build",
   "builds": [
     {
-      "src": "backend/src/index.ts",
+      "src": "backend/api/index.ts",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "backend/src/index.ts"
+      "dest": "backend/api/index.ts"
     }
   ]
 }

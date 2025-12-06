@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
+import { AiFillLike } from 'react-icons/ai'
 
 interface User {
   id: string
@@ -16,6 +17,7 @@ interface Reply {
   content: string
   likesCount: number
   likes: any[]
+  isLikedByMe: boolean
   createdAt: string
 }
 
@@ -27,6 +29,7 @@ interface Comment {
   content: string
   likesCount: number
   likes: any[]
+  isLikedByMe: boolean
   replies: Reply[]
   createdAt: string
 }
@@ -51,7 +54,7 @@ const CommentsModal = ({ postId, onClose }: CommentsModalProps) => {
   const fetchComments = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:9000/api/posts/${postId}/comments`,
+        `${import.meta.env.VITE_API_URL}/api/posts/${postId}/comments`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -62,6 +65,9 @@ const CommentsModal = ({ postId, onClose }: CommentsModalProps) => {
       if (response.data.success) {
         setComments(response.data.comments)
       }
+
+      console.log(response);
+      
       setLoading(false)
     } catch (error) {
       console.error('Failed to fetch comments:', error)
@@ -89,7 +95,7 @@ const CommentsModal = ({ postId, onClose }: CommentsModalProps) => {
 
     try {
       const response = await axios.post(
-        `http://localhost:9000/api/posts/comments/${commentId}/replies`,
+        `${import.meta.env.VITE_API_URL}/api/posts/comments/${commentId}/replies`,
         { content },
         {
           headers: {
@@ -113,7 +119,7 @@ const CommentsModal = ({ postId, onClose }: CommentsModalProps) => {
 
     try {
       const response = await axios.post(
-        `http://localhost:9000/api/posts/${postId}/comments`,
+        `${import.meta.env.VITE_API_URL}/api/posts/${postId}/comments`,
         { content: commentText },
         {
           headers: {
@@ -134,7 +140,7 @@ const CommentsModal = ({ postId, onClose }: CommentsModalProps) => {
   const handleLikeComment = async (commentId: string) => {
     try {
       const res = await axios.post(
-        `http://localhost:9000/api/posts/comments/${commentId}/like`,
+        `${import.meta.env.VITE_API_URL}/api/posts/comments/${commentId}/like`,
         {},
         {
           headers: {
@@ -142,6 +148,7 @@ const CommentsModal = ({ postId, onClose }: CommentsModalProps) => {
           }
         }
       )
+      console.log(res);
       
       if (res.data.success) {
         fetchComments()
@@ -154,7 +161,7 @@ const CommentsModal = ({ postId, onClose }: CommentsModalProps) => {
   const handleLikeReply = async (replyId: string) => {
     try {
       const res = await axios.post(
-        `http://localhost:9000/api/posts/replies/${replyId}/like`,
+        `${import.meta.env.VITE_API_URL}/api/posts/replies/${replyId}/like`,
         {},
         {
           headers: {
@@ -257,7 +264,7 @@ const CommentsModal = ({ postId, onClose }: CommentsModalProps) => {
                   marginBottom: '12px'
                 }}>
                   <img 
-                    src={comment.author.image || 'https://via.placeholder.com/40'} 
+                    src={comment.author.image || 'https://www.shutterstock.com/image-vector/vector-flat-illustration-grayscale-avatar-600nw-2281862025.jpg'} 
                     alt={`${comment.author.firstName} ${comment.author.lastName}`}
                     style={{
                       width: '40px',
@@ -292,13 +299,22 @@ const CommentsModal = ({ postId, onClose }: CommentsModalProps) => {
                       gap: '16px',
                       padding: '4px 12px',
                       fontSize: '12px',
-                      color: '#65676b'
+                      color: '#65676b',
+                      alignItems: 'center'
                     }}>
                       <span 
-                        style={{ cursor: 'pointer', fontWeight: '600' }}
+                        style={{ 
+                          cursor: 'pointer', 
+                          fontWeight: '600',
+                          color: comment.isLikedByMe ? '#1877f2' : '#65676b',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}
                         onClick={() => handleLikeComment(comment.id)}
                       >
-                        Like
+                        {comment.isLikedByMe && <AiFillLike size={12} />}
+                        {comment.isLikedByMe ? 'Liked' : 'Like'}
                       </span>
                       <span 
                         style={{ cursor: 'pointer', fontWeight: '600' }}
@@ -308,7 +324,7 @@ const CommentsModal = ({ postId, onClose }: CommentsModalProps) => {
                       </span>
                       <span>{getTimeAgo(comment.createdAt)}</span>
                       {comment.likesCount > 0 && (
-                        <span>{comment.likesCount} likes</span>
+                        <span style={{ fontWeight: '400' }}>{comment.likesCount} {comment.likesCount === 1 ? 'like' : 'likes'}</span>
                       )}
                     </div>
 
@@ -359,7 +375,7 @@ const CommentsModal = ({ postId, onClose }: CommentsModalProps) => {
                             marginBottom: '8px'
                           }}>
                             <img 
-                              src={reply.author.image || 'https://via.placeholder.com/32'} 
+                              src={reply.author.image || 'https://www.shutterstock.com/image-vector/vector-flat-illustration-grayscale-avatar-600nw-2281862025.jpg'} 
                               alt={`${reply.author.firstName} ${reply.author.lastName}`}
                               style={{
                                 width: '32px',
@@ -394,18 +410,27 @@ const CommentsModal = ({ postId, onClose }: CommentsModalProps) => {
                                 gap: '16px',
                                 padding: '4px 12px',
                                 fontSize: '12px',
-                                color: '#65676b'
+                                color: '#65676b',
+                                alignItems: 'center'
                               }}>
                                 <span 
-                                  style={{ cursor: 'pointer', fontWeight: '600' }}
+                                  style={{ 
+                                    cursor: 'pointer', 
+                                    fontWeight: '600',
+                                    color: reply.isLikedByMe ? '#1877f2' : '#65676b',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '4px'
+                                  }}
                                   onClick={() => handleLikeReply(reply.id)}
                                 >
-                                  Like
+                                  {reply.isLikedByMe && <AiFillLike size={12} />}
+                                  {reply.isLikedByMe ? 'Liked' : 'Like'}
                                 </span>
                                 <span style={{ cursor: 'pointer', fontWeight: '600' }}>Reply</span>
                                 <span>{getTimeAgo(reply.createdAt)}</span>
                                 {reply.likesCount > 0 && (
-                                  <span>{reply.likesCount} likes</span>
+                                  <span style={{ fontWeight: '400' }}>{reply.likesCount} {reply.likesCount === 1 ? 'like' : 'likes'}</span>
                                 )}
                               </div>
                             </div>
@@ -429,7 +454,7 @@ const CommentsModal = ({ postId, onClose }: CommentsModalProps) => {
           alignItems: 'center'
         }}>
           <img 
-            src="https://via.placeholder.com/36" 
+            src="https://www.shutterstock.com/image-vector/vector-flat-illustration-grayscale-avatar-600nw-2281862025.jpg" 
             alt="Your profile"
             style={{
               width: '36px',

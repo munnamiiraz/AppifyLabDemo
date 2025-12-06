@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { User, MapPin, Briefcase, Heart, Calendar, Camera, Edit2, Users, Image, MoreHorizontal, ThumbsUp, MessageCircle, Share2 } from 'lucide-react';
+import { useState } from 'react';
+import { MapPin, Briefcase, Heart, Calendar, Camera, Edit2, Users, Image, MoreHorizontal, ThumbsUp, MessageCircle, Share2 } from 'lucide-react';
 
 export default function MyProfile() {
   const [activeTab, setActiveTab] = useState('posts');

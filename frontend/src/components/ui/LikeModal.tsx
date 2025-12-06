@@ -27,7 +27,7 @@ const LikesModal = ({ postId, onClose }: LikesModalProps) => {
   const fetchLikes = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:9000/api/posts/likes/${postId}`,
+        `${import.meta.env.VITE_API_URL}/api/posts/likes/${postId}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,

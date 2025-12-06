@@ -1,12 +1,11 @@
 import axios from 'axios';
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom';
 import type { Like } from '../../types'
 
-import { AiOutlineLike, AiFillLike, AiOutlineComment, AiOutlineShareAlt, AiFillHeart } from 'react-icons/ai'
+import { AiOutlineLike, AiFillLike, AiOutlineComment, AiOutlineShareAlt } from 'react-icons/ai'
 
-import PostImg from "../../assets/images/post_img.png"
-import CommentImg from "../../assets/images/comment_img.png"
+
 import LikesModal from './LikeModal'
 import CommentsModal from './CommentModal'
 import ThreeDotsMenu from './ThreedotMenu'
@@ -44,8 +43,8 @@ const Post = ({ post, refetch }: PostProps) => {
 
   const handleLikePost = async (postId: string) => {
     try {
-      const res = await axios.post(
-        `http://localhost:9000/api/posts/${postId}/react`,
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/posts/${postId}/react`,
         {postId}, 
         {
           headers: {
@@ -54,10 +53,8 @@ const Post = ({ post, refetch }: PostProps) => {
         }
       )
       
-      if (res.data.success) {
-        // Refetch posts to update UI
-        refetch()
-      }
+      // Refetch posts to update UI
+      refetch()
     } catch (error) {
       console.error("Failed to toggle like:", error)
     }
@@ -65,8 +62,8 @@ const Post = ({ post, refetch }: PostProps) => {
 
   const handleLikeComment = async (commentId: string) => {
     try {
-      const res = await axios.post(
-        `http://localhost:9000/api/posts/comments/${commentId}/like`,
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/posts/comments/${commentId}/like`,
         {},
         {
           headers: {
@@ -75,9 +72,7 @@ const Post = ({ post, refetch }: PostProps) => {
         }
       )
       
-      if (res.data.success) {
-        refetch()
-      }
+      refetch()
     } catch (error) {
       console.error('Failed to like comment:', error)
     }
@@ -85,8 +80,8 @@ const Post = ({ post, refetch }: PostProps) => {
 
   const handleLikeReply = async (replyId: string) => {
     try {
-      const res = await axios.post(
-        `http://localhost:9000/api/posts/replies/${replyId}/like`,
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/posts/replies/${replyId}/like`,
         {},
         {
           headers: {
@@ -95,22 +90,20 @@ const Post = ({ post, refetch }: PostProps) => {
         }
       )
       
-      if (res.data.success) {
-        refetch()
-      }
+      refetch()
     } catch (error) {
       console.error('Failed to like reply:', error)
     }
   }
 
-  const handleSubmitComment = async (e: React.FormEvent, postId: string) => {
+  const handleSubmitComment = async (e: React.FormEvent<HTMLFormElement>, postId: string) => {
     e.preventDefault()
     const content = commentTexts[postId]
     if (!content || !content.trim()) return
 
     try {
-      const response = await axios.post(
-        `http://localhost:9000/api/posts/${postId}/comments`,
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/posts/${postId}/comments`,
         { content },
         {
           headers: {
@@ -119,23 +112,21 @@ const Post = ({ post, refetch }: PostProps) => {
         }
       )
       
-      if (response.data.success) {
-        setCommentTexts(prev => ({ ...prev, [postId]: '' }))
-        refetch()
-      }
+      setCommentTexts(prev => ({ ...prev, [postId]: '' }))
+      refetch()
     } catch (error) {
       console.error('Failed to post comment:', error)
     }
   }
 
-  const handleSubmitReply = async (e: React.FormEvent, commentId: string) => {
+  const handleSubmitReply = async (e: React.FormEvent<HTMLFormElement>, commentId: string) => {
     e.preventDefault()
     const content = replyTexts[commentId]
     if (!content || !content.trim()) return
 
     try {
-      const response = await axios.post(
-        `http://localhost:9000/api/posts/comments/${commentId}/replies`,
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/posts/comments/${commentId}/replies`,
         { content },
         {
           headers: {
@@ -144,11 +135,9 @@ const Post = ({ post, refetch }: PostProps) => {
         }
       )
       
-      if (response.data.success) {
-        setReplyTexts(prev => ({ ...prev, [commentId]: '' }))
-        setShowReplyBox(prev => ({ ...prev, [commentId]: false }))
-        refetch()
-      }
+      setReplyTexts(prev => ({ ...prev, [commentId]: '' }))
+      setShowReplyBox(prev => ({ ...prev, [commentId]: false }))
+      refetch()
     } catch (error) {
       console.error('Failed to post reply:', error)
     }
@@ -187,9 +176,9 @@ const Post = ({ post, refetch }: PostProps) => {
     if (!editContent.trim()) return;
     
     try {
-      const res = await axios.put(
-        `http://localhost:9000/api/user/post`,
-        { postId, content: editContent },
+      await axios.put(
+        `${import.meta.env.VITE_API_URL}/api/posts/${postId}`,
+        { content: editContent },
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -197,11 +186,9 @@ const Post = ({ post, refetch }: PostProps) => {
         }
       );
       
-      if (res.data.success) {
-        setEditingPostId(null);
-        setEditContent('');
-        refetch();
-      }
+      setEditingPostId(null);
+      setEditContent('');
+      refetch();
     } catch (error) {
       console.error('Failed to edit post:', error);
       alert('Failed to edit post. Please try again.');
@@ -219,25 +206,21 @@ const Post = ({ post, refetch }: PostProps) => {
     }
     
     try {
-      const res = await axios.delete(
-        `http://localhost:9000/api/user/post`,
+      await axios.delete(
+        `${import.meta.env.VITE_API_URL}/api/posts/${postId}`,
         {
-          data: { postId },
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           }
         }
       );
       
-      if (res.data.success) {
-        refetch();
-      }
+      setActiveDropdown(null);
+      refetch();
     } catch (error) {
       console.error('Failed to delete post:', error);
       alert('Failed to delete post. Please try again.');
     }
-    
-    setActiveDropdown(null);
   }
   const getTimeAgo = (dateString: string) => {
       const date = new Date(dateString)
@@ -270,7 +253,7 @@ const Post = ({ post, refetch }: PostProps) => {
           <div className="_feed_inner_timeline_post_box">
             <div className="_feed_inner_timeline_post_box_image">
               <img
-                src={post.author.image || PostImg} 
+                src={post.author.image || "https://www.shutterstock.com/image-vector/vector-flat-illustration-grayscale-avatar-600nw-2281862025.jpg"} 
                 alt={`${post.author.firstName} ${post.author.lastName}`} 
                 className="_post_img" 
               />
@@ -354,14 +337,14 @@ const Post = ({ post, refetch }: PostProps) => {
       <div className="_padd_r24 _padd_l24 _mar_b16">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           {post.likesCount > 0 && (
-            <p 
+            <p
               onClick={() => toggleLikesModal(post.id)} 
               style={{ 
                 cursor: 'pointer', 
-                fontWeight: '600', 
-                fontSize: '14px',
+                fontWeight: '400', 
+                fontSize: '13px',
                 margin: 0,
-                color: '#262626'
+                color: '#65676b'
               }}
             >
               {post.likesCount} {post.likesCount === 1 ? 'like' : 'likes'}
@@ -422,7 +405,7 @@ const Post = ({ post, refetch }: PostProps) => {
           <form className="_feed_inner_comment_box_form" onSubmit={(e) => handleSubmitComment(e, post.id)}>
             <div className="_feed_inner_comment_box_content">
               <div className="_feed_inner_comment_box_content_image">
-                <img src={CommentImg} alt="" className="_comment_img" />
+                <img src="https://www.shutterstock.com/image-vector/vector-flat-illustration-grayscale-avatar-600nw-2281862025.jpg" alt="" className="_comment_img" />
               </div>
               <div className="_feed_inner_comment_box_content_txt">
                 <textarea
@@ -494,7 +477,7 @@ const Post = ({ post, refetch }: PostProps) => {
               <div className="_comment_image">
                 <Link to="profile.html" className="_comment_image_link">
                   <img 
-                    src={comment.author.image || CommentImg} 
+                    src={comment.author.image || "https://www.shutterstock.com/image-vector/vector-flat-illustration-grayscale-avatar-600nw-2281862025.jpg"} 
                     alt={`${comment.author.firstName} ${comment.author.lastName}`} 
                     className="_comment_img1" 
                   />
@@ -504,7 +487,7 @@ const Post = ({ post, refetch }: PostProps) => {
                 <div className="_comment_details">
                   <div className="_comment_details_top">
                     <div className="_comment_name">
-                      <Link to="profile.html">
+                      <Link to="/">
                         <h4 className="_comment_name_title">
                           {comment.author.firstName} {comment.author.lastName}
                         </h4>
@@ -522,9 +505,6 @@ const Post = ({ post, refetch }: PostProps) => {
                         <span className="_reaction_like">
                           <AiFillLike size={14} color="#1877f2" />
                         </span>
-                        <span className="_reaction_heart">
-                          <AiFillHeart size={14} color="#e91e63" />
-                        </span>
                       </div>
                       <span className="_total">
                         {comment.likesCount}
@@ -533,10 +513,37 @@ const Post = ({ post, refetch }: PostProps) => {
                   )}
                   <div className="_comment_reply">
                     <div className="_comment_reply_num">
-                      <ul className="_comment_reply_list">
-                        <li><span onClick={() => handleLikeComment(comment.id)} style={{ cursor: 'pointer' }}>{isCommentLiked ? 'Liked' : 'Like'}.</span></li>
-                        <li><span onClick={() => toggleReplyBox(comment.id)} style={{ cursor: 'pointer' }}>Reply.</span></li>
-                        <li><span className="_time_link">.{getTimeAgo(comment.createdAt)}</span></li>
+                      <ul className="_comment_reply_list" style={{ display: 'flex', gap: '12px', alignItems: 'center', listStyle: 'none', padding: 0, margin: 0 }}>
+                        <li>
+                          <span 
+                            onClick={() => handleLikeComment(comment.id)} 
+                            style={{ 
+                              cursor: 'pointer',
+                              color: isCommentLiked ? '#1877f2' : '#65676b',
+                              fontWeight: '600',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                              fontSize: '13px'
+                            }}
+                          >
+                            {isCommentLiked && <AiFillLike size={12} />}
+                            {isCommentLiked ? 'Liked' : 'Like'}
+                          </span>
+                        </li>
+                        <li>
+                          <span 
+                            onClick={() => toggleReplyBox(comment.id)} 
+                            style={{ cursor: 'pointer', fontWeight: '600', color: '#65676b', fontSize: '13px' }}
+                          >
+                            Reply
+                          </span>
+                        </li>
+                        <li>
+                          <span style={{ color: '#65676b', fontSize: '12px' }}>
+                            {getTimeAgo(comment.createdAt)}
+                          </span>
+                        </li>
                       </ul>
                     </div>
                   </div>
@@ -547,7 +554,7 @@ const Post = ({ post, refetch }: PostProps) => {
                     <form className="_feed_inner_comment_box_form" onSubmit={(e) => handleSubmitReply(e, comment.id)}>
                       <div className="_feed_inner_comment_box_content">
                         <div className="_feed_inner_comment_box_content_image">
-                          <img src={CommentImg} alt="" className="_comment_img" />
+                          <img src="https://www.shutterstock.com/image-vector/vector-flat-illustration-grayscale-avatar-600nw-2281862025.jpg" alt="" className="_comment_img" />
                         </div>
                         <div className="_feed_inner_comment_box_content_txt">
                           <textarea 
@@ -595,7 +602,7 @@ const Post = ({ post, refetch }: PostProps) => {
                   <div className="_comment_image">
                     <Link to="profile.html" className="_comment_image_link">
                       <img 
-                        src={reply.author.image || CommentImg} 
+                        src={reply.author.image || "https://www.shutterstock.com/image-vector/vector-flat-illustration-grayscale-avatar-600nw-2281862025.jpg"} 
                         alt={`${reply.author.firstName} ${reply.author.lastName}`} 
                         className="_comment_img1" 
                       />
@@ -623,20 +630,40 @@ const Post = ({ post, refetch }: PostProps) => {
                             <span className="_reaction_like">
                               <AiFillLike size={14} color="#1877f2" />
                             </span>
-                            <span className="_reaction_heart">
-                              <AiFillHeart size={14} color="#e91e63" />
-                            </span>
                           </div>
                           <span className="_total">{reply.likesCount}</span>
                         </div>
                       )}
                       <div className="_comment_reply">
                         <div className="_comment_reply_num">
-                          <ul className="_comment_reply_list">
-                            <li><span onClick={() => handleLikeReply(reply.id)} style={{ cursor: 'pointer' }}>{isReplyLiked ? 'Liked' : 'Like'}.</span></li>
-                            <li><span>Reply.</span></li>
-                            <li><span>Share</span></li>
-                            <li><span className="_time_link">.{getTimeAgo(reply.createdAt)}</span></li>
+                          <ul className="_comment_reply_list" style={{ display: 'flex', gap: '12px', alignItems: 'center', listStyle: 'none', padding: 0, margin: 0 }}>
+                            <li>
+                              <span 
+                                onClick={() => handleLikeReply(reply.id)} 
+                                style={{ 
+                                  cursor: 'pointer',
+                                  color: isReplyLiked ? '#1877f2' : '#65676b',
+                                  fontWeight: '600',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '4px',
+                                  fontSize: '13px'
+                                }}
+                              >
+                                {isReplyLiked && <AiFillLike size={12} />}
+                                {isReplyLiked ? 'Liked' : 'Like'}
+                              </span>
+                            </li>
+                            <li>
+                              <span style={{ fontWeight: '600', color: '#65676b', fontSize: '13px' }}>
+                                Reply
+                              </span>
+                            </li>
+                            <li>
+                              <span style={{ color: '#65676b', fontSize: '12px' }}>
+                                {getTimeAgo(reply.createdAt)}
+                              </span>
+                            </li>
                           </ul>
                         </div>
                       </div>
