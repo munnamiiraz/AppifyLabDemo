@@ -42,6 +42,14 @@ npm start
 - Start Command: `npm start`
 - Node Version: 18.x or higher
 
+### For Vercel Deployment:
+1. Connect your GitHub repository to Vercel
+2. Set environment variables in Vercel dashboard
+3. Vercel will automatically detect the configuration
+4. Build Command: `npm run vercel-build` (or leave default)
+5. Output Directory: `dist`
+6. Install Command: `npm install`
+
 The application will automatically:
 - Generate Prisma client
 - Run database migrations

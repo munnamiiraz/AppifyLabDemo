@@ -825,6 +825,7 @@ export const getComments = async (req: Request, res: Response) => {
   try {
     const { postId } = req.params;
     const { page = 1, limit = 10 } = req.query;
+    const userId = req.user.id;
 
     const skip = (Number(page) - 1) * Number(limit);
 
@@ -852,7 +853,15 @@ export const getComments = async (req: Request, res: Response) => {
 
             }
           },
-          likes: true,
+          likes: {
+            include: {
+              user: {
+                select: {
+                  id: true
+                }
+              }
+            }
+          },
           replies: {
             include: {
               author: {
@@ -865,7 +874,15 @@ export const getComments = async (req: Request, res: Response) => {
 
                 }
               },
-              likes: true
+              likes: {
+                include: {
+                  user: {
+                    select: {
+                      id: true
+                    }
+                  }
+                }
+              }
             },
             orderBy: { createdAt: 'asc' }
           }
@@ -877,9 +894,21 @@ export const getComments = async (req: Request, res: Response) => {
       prisma.comment.count({ where: { postId } })
     ]);
 
+    // Add isLikedByMe flag
+    const commentsWithLikeStatus = comments.map(comment => ({
+      ...comment,
+      likesCount: comment.likes.length,
+      isLikedByMe: comment.likes.some(like => like.userId === userId),
+      replies: comment.replies.map(reply => ({
+        ...reply,
+        likesCount: reply.likes.length,
+        isLikedByMe: reply.likes.some(like => like.userId === userId)
+      }))
+    }));
+
     return res.status(200).json({
       success: true,
-      comments,
+      comments: commentsWithLikeStatus,
       pagination: {
         total,
         page: Number(page),

@@ -52,4 +52,7 @@ const startServer = async (): Promise<void> => {
 
 startServer().catch(console.error);
 
+// Export for Vercel
+export default app;
+
 
